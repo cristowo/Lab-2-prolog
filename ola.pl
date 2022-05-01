@@ -25,9 +25,9 @@ c3(N,R,[R|C],J,N1):-
     J1 is J+1,
     c3(N,[1|L],C,J1,N1).
 %--------------------------------------------------------------
-op2(N,I,J,K,L):- L is (N+2+N*(K-1)+(((I-1)*(K-1)+J-1) mod N)).
+op2(N,I,J,K,L):- L is (N+2+(N*(K-1))+((((I-1)*(K-1))+J-1) mod N)).
 %--------------------------------------------------------------
-c4(N,I,J,K,M):-op2(N,I,J,K,M2),N1 is N+1,c4(N,M2,M,I,J,2,N1).
+c4(N,I,J,M):-op2(N,I,J,1,M2),N1 is N+1,c4(N,M2,M,I,J,2,N1).
 
 c4(N,M,[M],I,J,N1,N1).
 c4(N,M,[M|L],I,J,K,N1):-
@@ -36,12 +36,12 @@ c4(N,M,[M|L],I,J,K,N1):-
     K1 is K+1,
     c4(N,M2,L,I,J,K1,N1).
 %--------------------------------------------------------------
-c5(N,R,I,J,K):-c4(N,I,J,K,M),N1 is N+1,Iz is I+1,c5(N,[Iz|M],R,I,2,N1,K).
+c5(N,R,I,J,K):-c4(N,I,J,M),N1 is N+1,Iz is I+1,c5(N,[Iz|M],R,I,2,N1,K).
 
 c5(N,R,[R],I,N1,N1,K). 
 c5(N,R,[R|C],I,J,N1,K):-
     N>=J,
-    c4(N,I,J,K,M),
+    c4(N,I,J,M),
     J1 is J+1,
     Iz is I+1,
     c5(N,[Iz|M],C,I,J1,N1,K).
@@ -56,9 +56,12 @@ c6(N,I,K,J,N1,M,R):-
     append(M,M1,Z),
     c6(N,I1,K,J,N1,Z,R).
 %--------------------------------------------------------------
-cards(N,R):-
+cards(N,R,NC):-
     c1(N,R1),
     N1 is N-1,
     c3(N1,R2),
     c6(N1,1,1,1,R3),
-    append(R1,R2,R3,R).
+    append([R1],R2,R4),
+    append(R4,R3,R5),
+    length(R, NC),				%para cortar las cartas
+    append(R, _, R5).
