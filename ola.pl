@@ -87,7 +87,7 @@ eleRep([E|Cola]):-				% este se verifica cuando se aplica el anterior
     M==M1,
     eleRep(Cola).
 
-oneElemPerCard([]).
+oneElemPerCard([]).				%un elemento en comun
 oneElemPerCard([E|Cola]):-oneElemPerCard2([E|Cola], E), oneElemPerCard(Cola).
 
 oneElemPerCard2([_|[]],_):-!.		
@@ -102,3 +102,13 @@ cardsSetIsDobble(L):-
     eleRep(L),
     oneElemPerCard(L).
 %--------------------------------------------------------------    
+cardsSetNthCard(Ls, N, Le):-
+    nth0(N,Le, Ls).
+%--------------------------------------------------------------   
+cardsSetFindTotalCards(Card, S):-
+    length(Card,N),
+    S is ((N-1)*(N-1))+N.
+%--------------------------------------------------------------
+
+
+
