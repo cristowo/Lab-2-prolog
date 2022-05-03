@@ -63,20 +63,42 @@ c6(N,I,K,J,N1,M,R,Ls):-
     append(M,M1,Z),
     c6(N,I1,K,J,N1,Z,R,Ls).
 %--------------------------------------------------------------
-cards(N,R,NC,Ls):-
+cardsSet(N,R,NC,Ls):-
     c1(N,R1,Ls),
     N1 is N-1,
     c3(N1,R2,Ls),
     c6(N1,1,1,1,R3,Ls),
     append([R1],R2,R4),
     append(R4,R3,R5),
-    length(R, NC),				%para cortar las cartas
+    length(R, NC),				% para cortar las cartas
     append(R, _, R5).
+%--------------------------------------------------------------
+tamListIgual([_|[]]):-!.		% tamaño lista igual
+tamListIgual([E|Cola]):-		% suponinendo que me pongan un mazo troll xd
+    nth1(1,Cola,M),
+    same_length(E,M),
+    tamListIgual(Cola).
 
+eleRep([_|[]]):-!.				% elementos repetidos en una carta
+eleRep([E|Cola]):-				% este se verifica cuando se aplica el anterior
+    length(E,M),
+    list_to_set(E,E1),
+    length(E1, M1),
+    M==M1,
+    eleRep(Cola).
 
+oneElemPerCard([]).
+oneElemPerCard([E|Cola]):-oneElemPerCard2([E|Cola], E), oneElemPerCard(Cola).
 
-list_to_set([1,2,2,4],L) %elementos repetidos en una carta
-same_length              %tamaño lista igual
+oneElemPerCard2([_|[]],_):-!.		
+oneElemPerCard2([E|Cola],N):-		
+    nth1(1,Cola,M),					
+    intersection(N,M,L),			
+    length(L,1),
+    oneElemPerCard2(Cola,N).
 
-intersection([1,6,3,8,9],[1,2,4,3,5],L)  %1 elemento en comun
-length([],L).
+cardsSetIsDobble(L):-
+    tamListIgual(L),
+    eleRep(L),
+    oneElemPerCard(L).
+%--------------------------------------------------------------    
