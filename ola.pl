@@ -63,15 +63,27 @@ c6(N,I,K,J,N1,M,R,Ls):-
     append(M,M1,Z),
     c6(N,I1,K,J,N1,Z,R,Ls).
 %--------------------------------------------------------------
-cardsSet(N,R,NC,Ls):-
+cardsSet2(N,R,Ls):-
     c1(N,R1,Ls),
     N1 is N-1,
     c3(N1,R2,Ls),
     c6(N1,1,1,1,R3,Ls),
     append([R1],R2,R4),
-    append(R4,R3,R5),
-    length(R, NC),				% para cortar las cartas
-    append(R, _, R5).
+    append(R4,R3,R).
+
+cardsSet(N,Lsalida,NC,Ls):-			
+    cardsSet2(N,R,Ls),
+    length(R,S),
+    S=NC,
+    cardsSet2(N,Lsalida,Ls),
+    !.
+cardsSet(N,Lsal,NC,Ls):-
+    cardsSet2(N,R,Ls),
+    length(R,S),
+    S > NC,
+    length(Lsal, NC),				% para cortar las cartas
+    append(Lsal, _, R),
+    !.
 %--------------------------------------------------------------
 tamListIgual([_|[]]):-!.		% tamaño lista igual
 tamListIgual([E|Cola]):-		% suponinendo que me pongan un mazo troll xd
@@ -108,6 +120,12 @@ cardsSetNthCard(Ls, N, Le):-
 cardsSetFindTotalCards(Card, S):-
     length(Card,N),
     S is ((N-1)*(N-1))+N.
+%--------------------------------------------------------------
+cardsSetMissingCards(Cs,MC):-	%tomar en cuenta que siempre se trabajara con una lista del tipo [a,b,c,d,e,f]
+    nth1(1, Cs, R1),
+    length(R1, S),
+    cardsSet(S,Out,_,[a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,ab,ac,ad,ae,af,ag,ah,ai,aj,ak,al,am,an,ao,ap,aq,ar,as,at,au,av,aw,ax,ay,az,ba,bb,bc]),
+    subtract(Out, Cs, MC). 
 %--------------------------------------------------------------
 
 
