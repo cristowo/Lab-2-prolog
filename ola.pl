@@ -127,6 +127,12 @@ cardsSetMissingCards(Cs,MC):-	%tomar en cuenta que siempre se trabajara con una 
     cardsSet(S,Out,_,[a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,ab,ac,ad,ae,af,ag,ah,ai,aj,ak,al,am,an,ao,ap,aq,ar,as,at,au,av,aw,ax,ay,az,ba,bb,bc]),
     subtract(Out, Cs, MC). 
 %--------------------------------------------------------------
+cardsSetToString([N|Cola], Str):-  atomics_to_string(N,N1), cardToStr(Cola,[N1],Str).
 
+cardToStr([Cola],_,Acum).
+cardToStr([C|Cola], Lista,Acum):-
+    atomics_to_string(C,X),
+    append(Lista,[X],Acum),
+    cardToStr(Cola,Acum,Acum).
 
 
