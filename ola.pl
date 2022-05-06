@@ -1,4 +1,7 @@
 %--------------------------------------------------------------
+listSymbols(L):-
+    append([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],[aa,ab,ac,ad,ae,af,ag,ah,ai,aj,ak,al,am,an,ao,ap,aq,ar,as,at,au,av,aw,ax,ay,az,ba,bb,bc],L).
+%--------------------------------------------------------------
 c1(N,M,Ls):-nth1(1,Ls,Xsimbo),N1 is N+1, c1(N,Xsimbo,M,2,N1,Ls).
 
 c1(N,M,[M],N1,N1,Ls).
@@ -127,12 +130,16 @@ cardsSetMissingCards(Cs,MC):-	%tomar en cuenta que siempre se trabajara con una 
     cardsSet(S,Out,_,[a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,ab,ac,ad,ae,af,ag,ah,ai,aj,ak,al,am,an,ao,ap,aq,ar,as,at,au,av,aw,ax,ay,az,ba,bb,bc]),
     subtract(Out, Cs, MC). 
 %--------------------------------------------------------------
-cardsSetToString([N|Cola], Str):-  atomics_to_string(N,N1), cardToStr(Cola,[N1],Str).
-
-cardToStr([Cola],_,Acum).
-cardToStr([C|Cola], Lista,Acum):-
-    atomics_to_string(C,X),
-    append(Lista,[X],Acum),
-    cardToStr(Cola,Acum,Acum).
+cardsSetToString(CS,S):- cardsSetToString2(CS, S2,[],1),reverse(S2,S3),atomics_to_string(S3,"\n",S).
+    
+cardsSetToString2([],Str,Str,_).
+cardsSetToString2([C|Cola],Str,L,I):-
+    atomics_to_string(C,"-",X),
+    append(["carta "],[I],Cartita),
+    atomics_to_string(Cartita," ",Cartita2),
+    append([Cartita2],[X],X1),
+    atomics_to_string(X1,": ",X2),
+    I1 is I+1,
+    cardsSetToString2(Cola,Str,[X2|L],I1).
 
 
