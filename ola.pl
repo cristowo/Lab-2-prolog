@@ -141,5 +141,25 @@ cardsSetToString2([C|Cola],Str,L,I):-
     atomics_to_string(X1,": ",X2),
     I1 is I+1,
     cardsSetToString2(Cola,Str,[X2|L],I1).
+%--------------------------------------------------------------
+genPlayers(1,Lp,Lp):-!.
+    
+genPlayers(N,Lp,X):-			  %tendra el nombre del jugador, el turno, los puntos, mazo actual.
+    append([N],[0,0,[]],Player),
+    N1 is N-1,
+    genPlayers(N1,Lp,[Player|X]).
 
+dobbleGame(NPlayers,CS,Mode,Game):-
+    genPlayers(NPlayers,Lp,[[1,0,0,[]]]),
+    append([NPlayers,[Lp]],[CS, Mode],Game).
+%--------------------------------------------------------------
+dobbleGameRegister(Name,[N,[Lp],Cs,Mode],[N,[GameOut1],Cs,Mode]):-	%recibe un name, game, gameOut
+    not(select([Name,0,0,[]],Lp,[Name,0,0,[]],GameOut1)),			%para cuando este el nombre repetido
+    select([K,0,0,[]],Lp,[Name,0,0,[]],GameOut1),					%agregar el name
+    number(N,
+    !.
+%--------------------------------------------------------------
+showTurno([_,_,Turno,_], Turno).
+showName([Name,_,_,_],Name).   
 
+dobbleGameWhoseTurnIsIt([N,[Lp],Cs,Mode],Name):-
