@@ -9,7 +9,7 @@ Espacio de trabajo para la realizacion del laboratorio 2 de paradigmas de progra
 
 a continuación los objetivos a realizar y su estado hasta el momento
 
-###  TDA cardsSet |☑
+###  TDA cardsSet       |Completo
 
 constructor		    	|☑
 
@@ -24,7 +24,7 @@ cardsSetMissingCards    |☑
 cardsSetToString	    |☑
 
 
-### TDA Game | incompleto
+### TDA Game            |Completo
 
 dobbleGame 	    	    |☑
 
@@ -32,11 +32,11 @@ dobbleGameRegister  	|☑
 
 dobbleGameWhoseTurnIsIt	|☑
 
-dobbleGamePlay 		    |☑
+dobbleGamePlay 		    |☑     -> tomar en cuenta que el Play solo fue diseñado para "stackMode"
 
 dobbleGameStatus	    |☑
 
 dobbleGameScore		    |☑
 
-dobbleGameToString	    |Casi
+dobbleGameToString	    |☑
 
