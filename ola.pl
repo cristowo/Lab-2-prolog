@@ -151,7 +151,10 @@ genPlayers(N,Lp,X):-			  %tendra el nombre del jugador, el turno, los puntos, ma
 
 dobbleGame(NPlayers,CS,Mode,Game):-					%[NumPlayers,ListPlayers,Mesa,CardsSet,Modo]
     genPlayers(NPlayers,Lp,[[1,0,0,[]]]),
-    append([NPlayers,[Lp]],[[],CS, Mode],Game).
+    reverse(CS, CS1),
+    append([[]],CS1,CS2),
+    reverse(CS2,CS3),
+    append([NPlayers,[Lp]],[[],CS3, Mode],Game).
 %--------------------------------------------------------------
 dobbleGameRegister(Name,[N,[Lp],[],Cs,Mode],[N,[GameOut1],[],Cs,Mode]):-	%recibe un name, game, gameOut
     not(select([Name,0,0,[]],Lp,[Name,0,0,[]],GameOut1)),					%para cuando este el nombre repetido
@@ -187,36 +190,67 @@ dobbleGameWhoseTurnIsIt([_,[Pl],_,_,_],Name):-
 %stackMode(Cs,Modo):-
     
 %--------------------------------------------------------------
-dobbleGamePlay([A,[B],_,Cs,C],Action,[A,[B],Mesa2,Acortar,C]):-
+%solo se pretende el play para el stack mode -> "stackMode".
+dobbleGamePlay([A,[B],_,Cs,Mode],Action,[A,[B],Mesa2,Acortar,Mode]):-	
+    Mode="stackMode",
     Action=null,
     length(Mesa2,2),
     append(Mesa2,Acortar,Cs),
     !.
-dobbleGamePlay([A,[B],Mesa,Cs,C],Action,[A,[B1],Mesa,Cs,C]):-
+
+dobbleGamePlay([A,[B],Mesa,Cs,Mode],Action,[A,[B1],Mesa,Cs,Mode]):-
+    Mode="stackMode",
     Action=[pass],
-    dobbleGameWhoseTurnIsIt([A,[B],Mesa,Cs,C], Name),
+    dobbleGameWhoseTurnIsIt([A,[B],Mesa,Cs,Mode], Name),
     select([Name,T,P,[]],B,_,B),
     T1 is T+1,
     select([Name,_,_,[]],B,[Name,T1,P,[]],B1),
     !.
 
-dobbleGamePlay([A,[B],[E1,E2],Cs,C],Action,Gout):-	%caso correcto
+dobbleGamePlay([A,[B],[_,[]],_,Mode],Action,[A,[B],[fin],[fin],"finish"]):- %vacio
+    Mode="stackMode",
+    Action=[spotIt,_,_],
+    !.
+
+dobbleGamePlay([A,[B],[E1,E2],Cs,Mode],Action,Gout):-					%caso correcto
+    Mode="stackMode",
     Action=[spotIt,Nombre,Elemento],
+    dobbleGameWhoseTurnIsIt([A,[B],[E1,E2],Cs,Mode], Nombre1),	
+    Nombre=Nombre1,														%ve si el que juega esta de turno
     intersection(E1,E2,[Elemento]),										%ve respuesta buena o mala
     select([Nombre,T,P,[]],B,_,B),										%encuentra el nombre
     T1 is T+1,															%suma 1 turno
     P1 is P+1,															%suma 1 punto
     select([Nombre,_,_,[]],B,[Nombre,T1,P1,[]],B1),
-    dobbleGamePlay([A,[B1],[E1,E2],Cs,C],null,Gout),					%siguientes 2 cartas
+    dobbleGamePlay([A,[B1],[E1,E2],Cs,Mode],null,Gout),					%siguientes 2 cartas
     !.
 
-dobbleGamePlay([A,[B],[E1,E2],Cs,C],Action,[A,[B1],[E1,E2],Cs,C]):-	%caso incorrecto
+dobbleGamePlay([A,[B],[E1,E2],Cs,Mode],Action,[A,[B1],[E1,E2],Cs,Mode]):- %caso incorrecto
+    Mode="stackMode",
     Action=[spotIt,Nombre,Elemento],
+    dobbleGameWhoseTurnIsIt([A,[B],[E1,E2],Cs,Mode], Nombre1),	
+    Nombre=Nombre1,														%ve si el que juega esta de turno
     not(intersection(E1,E2,[Elemento])),
     select([Nombre,T,P,[]],B,_,B),
     T1 is T+1,															%suma 1 turno
     select([Nombre,_,_,[]],B,[Nombre,T1,P,[]],B1),
     !.
+
+dobbleGamePlay([A,[B],_,_,Mode],Action, [A,[B],[fin],[fin],"finish"]):-
+    Mode="stackMode",
+    Action=[finish],
+    !.
+%--------------------------------------------------------------
+dobbleGameStatus([_,_,_,_,Mode],"En progreso"):-
+    not(Mode="finish").
+
+dobbleGameStatus([_,_,_,_,Mode],"finalizado"):-
+    Mode="finish".
+%--------------------------------------------------------------
+dobbleGameScore([_,[Pl],_,_,_], Name, Score):-
+    select([Name,_,Score,[]],Pl,_,Pl),
+    !.
+%--------------------------------------------------------------
 
 
 
