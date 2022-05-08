@@ -191,6 +191,7 @@ dobbleGameWhoseTurnIsIt([_,[Pl],_,_,_],Name):-
     
 %--------------------------------------------------------------
 %solo se pretende el play para el stack mode -> "stackMode".
+%---null-----
 dobbleGamePlay([A,[B],_,Cs,Mode],Action,[A,[B],Mesa2,Acortar,Mode]):-	
     Mode="stackMode",
     Action=null,
@@ -198,6 +199,7 @@ dobbleGamePlay([A,[B],_,Cs,Mode],Action,[A,[B],Mesa2,Acortar,Mode]):-
     append(Mesa2,Acortar,Cs),
     !.
 
+%---pass-----
 dobbleGamePlay([A,[B],Mesa,Cs,Mode],Action,[A,[B1],Mesa,Cs,Mode]):-
     Mode="stackMode",
     Action=[pass],
@@ -207,9 +209,17 @@ dobbleGamePlay([A,[B],Mesa,Cs,Mode],Action,[A,[B1],Mesa,Cs,Mode]):-
     select([Name,_,_,[]],B,[Name,T1,P,[]],B1),
     !.
 
-dobbleGamePlay([A,[B],[_,[]],_,Mode],Action,[A,[B],[fin],[fin],"finish"]):- %vacio
+%---spotIt-----
+dobbleGamePlay([A,[B],[_,[]],_,Mode],Action,Out):- 						%caso 1 queda 1 carta
     Mode="stackMode",
     Action=[spotIt,_,_],
+    dobbleGamePlay([A,[B],[_,[]],_,Mode],[finish],Out),
+    !.
+
+dobbleGamePlay([A,[B],[[]],_,Mode],Action,Out):- 						%caso ya no hay mas cartas
+    Mode="stackMode",
+    Action=[spotIt,_,_],
+    dobbleGamePlay([A,[B],[_,[]],_,Mode],[finish],Out),
     !.
 
 dobbleGamePlay([A,[B],[E1,E2],Cs,Mode],Action,Gout):-					%caso correcto
@@ -235,11 +245,56 @@ dobbleGamePlay([A,[B],[E1,E2],Cs,Mode],Action,[A,[B1],[E1,E2],Cs,Mode]):- %caso 
     T1 is T+1,															%suma 1 turno
     select([Nombre,_,_,[]],B,[Nombre,T1,P,[]],B1),
     !.
-
-dobbleGamePlay([A,[B],_,_,Mode],Action, [A,[B],[fin],[fin],"finish"]):-
+%---finish-----
+dobbleGamePlay([A,[B],_,_,Mode],Action, [S2,[B],[fin],[fin],"finish"]):-
     Mode="stackMode",
     Action=[finish],
+    mayorAmenor([A,[B],_,_,Mode],[],0,S1),
+    puestos(S1,S2),
     !.
+%----------------------------
+mayorAmenor([_,[[]],_,_,_],Lmm,I,[[I]|Lmm]):-!.		%predicado que ordena a los jugaodres segun su puntaje
+
+mayorAmenor([_,[Pl],_,_,_],Lmm,I,R):-
+    select([Name,_,I,[]],Pl,_,Pl),
+    append([[Name,I]],Lmm,Lmm1),
+    delete(Pl,[Name,_,I,[]],Pl2),
+    mayorAmenor([_,[Pl2],_,_,_],Lmm1,I,R),
+    !.
+           
+mayorAmenor([_,[Pl],_,_,_],Lmm,I,R):-
+    not(select([_,_,I,[]],Pl,_,Pl)),
+    I1 is I+1,
+    mayorAmenor([_,[Pl],_,_,_],Lmm,I1,R),
+    !.
+%----------------------------
+puestos([[X]|Cola],Salida):-primerPuesto(Cola,X,[],Salida).
+    
+primerPuesto([First|Cola],X,R,Rf):-
+    nth1(1,First,Name),
+    nth1(2,First,Punto),
+    X=Punto,
+    append(R,[Name],R1),
+    primerPuesto(Cola,X,R1,Rf),
+    !.
+
+primerPuesto([First|Cola],X,R,Rf):-
+    nth1(2,First,Punto),
+    not(X=Punto),
+    jugadoresCola([First|Cola],[],Pierde),
+    append(["perdedor/xs:"],Pierde,S1),
+    append(R,S1,S2),
+    append(["ganador/xs:"],S2,Rf),
+    !.
+
+primerPuesto([],_,R,Rf):-
+    append(["Empate entre:"],R,Rf).
+
+jugadoresCola([[X|_]|Cola],L,LS):-
+    append([X],L,L1),
+    jugadoresCola(Cola,L1,LS),
+    !.
+jugadoresCola([],LS,LS).
 %--------------------------------------------------------------
 dobbleGameStatus([_,_,_,_,Mode],"En progreso"):-
     not(Mode="finish").
@@ -247,15 +302,34 @@ dobbleGameStatus([_,_,_,_,Mode],"En progreso"):-
 dobbleGameStatus([_,_,_,_,Mode],"finalizado"):-
     Mode="finish".
 %--------------------------------------------------------------
-dobbleGameScore([_,[Pl],_,_,_], Name, Score):-
+dobbleGameScore([_,[Pl],_,_,_], Name, Score):-	%score para juego 
     select([Name,_,Score,[]],Pl,_,Pl),
     !.
 %--------------------------------------------------------------
+jugadoresToStr([[Name,Turno,Puntos,_]|Cola],L,LS):-
+    atomics_to_string(["jugador/a:",Name,"Posee:",Puntos,"Puntos","en el turno:",Turno]," ",JugadoresStr),
+    append([JugadoresStr],L,L1),
+    jugadoresToStr(Cola,L1,LS),
+    !.
+jugadoresToStr([],LS,LS).
 
-
-
-
-
+dobbleGameToString([NumPlayers,[Pl],Mesa,Mazo,Modo],GameStr):-					%Para juego en desarrollo							
+    number(NumPlayers),
+    cardsSetToString(Mesa,MesaStr),
+    cardsSetToString(Mazo,MazoStr),
+    jugadoresToStr(Pl,[],Jugadores),
+    atomics_to_string(Jugadores,"\n",JugadoresStr),
+    append([],["Jugando:",Modo,"- activo\n","En la Mesa tenemos:",MesaStr,"\n",
+                "En el mazo restante se tienen:" ,MazoStr,"\n","El estado de jugadores es:",
+                JugadoresStr],GameStr1),
+    atomics_to_string(GameStr1," ",GameStr).
+                     
+                   
+                   
+                   
+                   
+                   
+                   
 
 /** <examples>
 ?- cardsSet(3,CS,3,[a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z]),  dobbleGame( 4, CS, Mode, G), dobbleGameRegister("tonito", G, X), dobbleGameRegister("cri", X, X1),dobbleGameRegister("juan", X1, X2),dobbleGameRegister("daigozzz", X2, X3), dobbleGameWhoseTurnIsIt(X3, Name).
