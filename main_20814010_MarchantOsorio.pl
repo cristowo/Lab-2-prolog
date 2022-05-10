@@ -696,13 +696,13 @@ dobbleGameToString([NumPlayers,[Pl],_,_,Modo],GameStr):-					%para juego finaliz
 %-----------------------------------------------------------------------------------
 
 %------------------------------cardsSet-Constructor---------------------------------
-% CardaSet de 3 elementos por carta, con un maximo de 4 cartas, de orden aleatorio.
+% CardsSet de 3 elementos por carta, con un maximo de 4 cartas, de orden aleatorio.
 % cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],3,4,4512331,CS1).
 
-% CardaSet de 4 elementos por carta, con un maximo de 8 cartas, sin orden aleatorio.
+% CardsSet de 4 elementos por carta, con un maximo de 8 cartas, sin orden aleatorio.
 % cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,8,0,CS2).
 
-% CardaSet de 4 elementos por carta, que muestra todas las cartas, de orden aleatorio.
+% CardsSet de 4 elementos por carta, que muestra todas las cartas, de orden aleatorio.
 % cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,MAX,4352315,CS3).
 
 %--------------------------cardsSetIsDobble----------------------------------------
@@ -726,13 +726,13 @@ dobbleGameToString([NumPlayers,[Pl],_,_,Modo],GameStr):-					%para juego finaliz
 % cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,235236,CS3), cardsSetNthCard(CS3,4,Nth3).
 
 %-----------------------cardsSetFindTotalCards--------------------------------------
-% cartas totales de la primera carta de un mazo de 3 elementos, max 4 cartas y desordenado
+% Cartas totales de la primera carta de un mazo de 3 elementos, max 4 cartas y desordenado
 % cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],3,4,4512331,CS1), cardsSetNthCard(CS1,0,Nth1), cardsSetFindTotalCards(Nth1, TCards).
 
-% cartas totales de una carta valida
+% Cartas totales de una carta valida
 % cardsSetFindTotalCards([1,3,4,5], TCards2).
 
-% cartas totales de la quinta carta de un mazo de 4 elementos, max 5 cartas y desordenado
+% Cartas totales de la quinta carta de un mazo de 4 elementos, max 5 cartas y desordenado
 % cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,235236,CS3), cardsSetNthCard(CS3,4,Nth3), cardsSetFindTotalCards(Nth3, TCards3).
 
 %---------------------cardsSetMissingCards------------------------------------------

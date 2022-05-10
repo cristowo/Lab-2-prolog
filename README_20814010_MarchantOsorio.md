@@ -40,3 +40,8 @@ dobbleGameScore		    |☑
 
 dobbleGameToString	    |☑
 
+
+## Datos acerca de la implementación:
+
+Esta implementado para que funcione que un cardsSet infinito, pero el missingCard solo funciona con un cardsSet de Maximo 8 elementos.
+

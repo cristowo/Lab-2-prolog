@@ -1,0 +1,17 @@
+Cristóbal Marchant      20.814.010-8
+
+Elementos por evaluar 		Calificación
+TDAs					1
+TDA cardsSet - constructor		1
+TDA cardsSet - IsDobble			1
+TDA cardsSet - NthCard			1
+TDA cardsSet - FindTotalCards		1
+TDA cardsSet - MissingCards		1
+TDA cardsSet - ToString			1
+TDA game - constructor			1
+TDA game - Register			1
+TDA game - WhoseTurnIsIt		1
+TDA game - Play				1
+TDA game - Status			1
+TDA game - Score			1
+TDA game - ToString			1
