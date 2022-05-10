@@ -60,7 +60,7 @@ Metas:
 	Primarias:
 	cardsSet(Lsimbolos,Nelementos,Nmax,Seed,Lsalida).
 	cardsSetIsDobble(Lentrada).
-	cardsSetNthCard(Lsalida,Num,Lentrada).
+	cardsSetNthCard(Lentrada,Num,Lsalida).
 	cardsSetFindTotalCards(Lentrada,Num).
 	cardsSetMissingCards(Lentrada,Lsalida).
 	cardsSetToString(Lentrada,Str).
@@ -77,7 +77,7 @@ punto y poder dar aleatorización al orden de estas cartas.
 
 
 % Lista de elementos planteada a utilizar para maximo 8 elementos.
-% [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,ab,ac,ad,ae,af,ag,ah,ai,aj,ak,al,am,an,ao,ap,aq,ar,as,at,au,av,aw,ax,ay,az,ba,bb,bc]
+% [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,ab,ac,ad,ae,af,ag,ah,ai,aj,ak,al,am,an,ao,ap,aq,ar,as,at,au,av,aw,ax,ay,az,ba,bb,bc,bd,be,bf]
 
 %----------------------Generacion de 1 Carta----------------------------------------
 % Constructor
@@ -303,16 +303,23 @@ cardsSetIsDobble(L):-
 % Selector
 % Dominio: Lista X Entero X Lista
 % Descripcion: Regrega La carta N, desde un mazo, entre 0 y tamaño mazo-1
-cardsSetNthCard(Ls, N, Le):-
+cardsSetNthCard(Le, N, Ls):-
     nth0(N,Le, Ls).
 
 %-----------------------cardsSetFindTotalCards--------------------------------------
 % Otros
 % Dominio: Lista X Entero
 % Descripcion: Cantidad de cartas totales, a base de una carta
+% Caso Lista con elementos
 cardsSetFindTotalCards(Card, S):-
     length(Card,N),
-    S is ((N-1)*(N-1))+N.
+    N>0,
+    S is ((N-1)*(N-1))+N,
+    !.
+% Caso Lista vacia
+cardsSetFindTotalCards(Card, 0):-
+    length(Card,N),
+    N=0.
 
 %---------------------cardsSetMissingCards------------------------------------------
 % Otros
@@ -321,7 +328,7 @@ cardsSetFindTotalCards(Card, S):-
 cardsSetMissingCards(Cs,MC):-	%tomar en cuenta que siempre se trabajara con una lista del tipo [a,b,c,d,e,f]
     nth1(1, Cs, R1),
     length(R1, S),
-    cardsSet(S,Out,_,[a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,ab,ac,ad,ae,af,ag,ah,ai,aj,ak,al,am,an,ao,ap,aq,ar,as,at,au,av,aw,ax,ay,az,ba,bb,bc]),
+    cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,ab,ac,ad,ae,af,ag,ah,ai,aj,ak,al,am,an,ao,ap,aq,ar,as,at,au,av,aw,ax,ay,az,ba,bb,bc,bd,be,bf],S,_,0,Out),
     subtract(Out, Cs, MC). 
 
 %---------------------cardsSetToString---------------------------------------------
@@ -631,7 +638,8 @@ jugadoresCola([],LS,LS).
 % Descripcion: entrega el status del juego
 % Caso 1, En progreso
 dobbleGameStatus([_,_,_,_,Mode],"En progreso"):-
-    not(Mode="finish").
+    not(Mode="finish"),
+    !.
 % Caso 2, Finalizado
 dobbleGameStatus([_,_,_,_,Mode],"Finalizado"):-
     Mode="finish".
@@ -668,7 +676,8 @@ dobbleGameToString([NumPlayers,[Pl],Mesa,Mazo,Modo],GameStr):-					%Para juego e
     append([],["Jugando:",Modo,"- activo\n","En la Mesa tenemos:",MesaStr,"\n",
                 "En el mazo restante se tienen:" ,MazoStr,"\n","El estado de jugadores es:",
                 JugadoresStr],GameStr1),
-    atomics_to_string(GameStr1," ",GameStr).
+    atomics_to_string(GameStr1," ",GameStr),
+    !.
 % Caso 2, Juego finalizado                    
 dobbleGameToString([NumPlayers,[Pl],_,_,Modo],GameStr):-					%para juego finalizado
     Modo="finish",
@@ -677,21 +686,151 @@ dobbleGameToString([NumPlayers,[Pl],_,_,Modo],GameStr):-					%para juego finaliz
     append(["Modo de juego finalizado\n","Lo que nos deja los siguientes puntajes:",
              JugadoresStr,"\n","El resultado final fue:"], NumPlayers, GameStr1),
     atomics_to_string(GameStr1," ",GameStr).
-    
-    
-                   
-                   
-                   
 
-/** <examples>
+%-----------------------------------------------------------------------------------
+%-----------------------------------EJMEPLOS----------------------------------------
+%-----------------------------------------------------------------------------------
 
-?- dobbleGameWhoseTurnIsIt([4, [[
-      ["tonito", 2, 2, []],
-      ["cri", 1, 1, []],
-      ["juan", 1, 1, []],
-      ["daigozzz", 1, 1, []]
-      ]], [],[[a, b, c], [a, d, e], [a, f, g]], Mode], Name).
-?- cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],3,4,4421,CS),  dobbleGame( 4, CS, Mode,42132, G), dobbleGameRegister("tonito", G, X), dobbleGameRegister("cri", X, X1),dobbleGameRegister("juan", X1, X2),dobbleGameRegister("daigozzz", X2, X3), dobbleGameWhoseTurnIsIt(X3, Name).
-?- cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],3,4,4421,CS),  dobbleGame( 4, CS, Mode,42132, G), dobbleGameRegister("tonito", G, X), dobbleGameRegister("cri", X, X1),dobbleGameRegister("juan", X1, X2),dobbleGameRegister("daigozzz", X2, X3),dobbleGamePlay(X3,null,X4),dobbleGamePlay(X4,[spotIt,"juan",a],X5), dobbleGamePlay(X5,[spotIt,"cri",c],X6),dobbleGamePlay(X6,[pass],X7),dobbleGamePlay(X7,[spotIt,"daigozzz",f],X8),dobbleGamePlay(X8,[spotIt,"juan",g],X9),dobbleGamePlay(X9,[spotIt,"cri",g],XDiez),
-   dobbleGameStatus(XDiez,XStatus),dobbleGameScore(XDiez,"tonito",XSxore),dobbleGameToString(XDiez,ToStr),display(ToStr).
-*/
+%-----------------------------------------------------------------------------------
+%-----------------------------------TDA-cardsSet------------------------------------
+%-----------------------------------------------------------------------------------
+
+%------------------------------cardsSet-Constructor---------------------------------
+% CardaSet de 3 elementos por carta, con un maximo de 4 cartas, de orden aleatorio.
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],3,4,4512331,CS1).
+
+% CardaSet de 4 elementos por carta, con un maximo de 8 cartas, sin orden aleatorio.
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,8,0,CS2).
+
+% CardaSet de 4 elementos por carta, que muestra todas las cartas, de orden aleatorio.
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,MAX,4352315,CS3).
+
+%--------------------------cardsSetIsDobble----------------------------------------
+% Dobble de un mazo de 3 elementos y maximo 4 cartas con orden aleatorio -> true
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n],3,4,4512331,CS1), cardsSetIsDobble(CS1). 
+
+% Dobble de un mazo de 3 elementos y maximo 3 cartas -> false (hay mas de un elemento en común)
+% cardsSetIsDobble([[1,2,3],[1,4,5],[1,5,6]]).      
+
+% Dobble de un mazo de 3 elementos y maximo 3 cartas -> false (hay 2 elementos iguales en 1 carta)
+% cardsSetIsDobble([[1,2,3],[1,4,5],[1,6,6]]).   
+
+%----------------------------cardsSetNthCard----------------------------------------
+% Primera carta de un mazo de 3 elementos, max 4 cartas y desordenado
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],3,4,4512331,CS1), cardsSetNthCard(CS1,0,Nth1).
+
+% Primera carta de un mazo de 3 elementos, max 4 cartas y ordenado
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],3,4,0,CS2), cardsSetNthCard(CS2,0,Nth2).
+
+% Quinta carta de un mazo de 4 elementos, max 5 cartas y desordenado
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,235236,CS3), cardsSetNthCard(CS3,4,Nth3).
+
+%-----------------------cardsSetFindTotalCards--------------------------------------
+% cartas totales de la primera carta de un mazo de 3 elementos, max 4 cartas y desordenado
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],3,4,4512331,CS1), cardsSetNthCard(CS1,0,Nth1), cardsSetFindTotalCards(Nth1, TCards).
+
+% cartas totales de una carta valida
+% cardsSetFindTotalCards([1,3,4,5], TCards2).
+
+% cartas totales de la quinta carta de un mazo de 4 elementos, max 5 cartas y desordenado
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,235236,CS3), cardsSetNthCard(CS3,4,Nth3), cardsSetFindTotalCards(Nth3, TCards3).
+
+%---------------------cardsSetMissingCards------------------------------------------
+% missingCards de un mazo de 3 elementos, max 4 cartas y desordenado
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],3,4,4512331,CS1), cardsSetMissingCards(CS1, Mcards1).
+
+% missingCards de una carta de 8 elementos
+% cardsSetMissingCards([[a,b,c,d,e,f,g,h]], TCards2).
+
+% missingCards de un mazo de 4 elementos, max 5 cartas y ordenada
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), cardsSetMissingCards(CS3, Mcards1).
+
+%---------------------cardsSetToString---------------------------------------------
+% cardsSetToString de un mazo de 3 elementos, max 4 cartas y desordenado
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],3,4,4512331,CS1), cardsSetToString(CS1,CSTS1).
+
+% cardsSetToString de una carta
+% cardsSetToString([[a,b,c,d,e]],CSTS2).
+
+% cardsSetToString de un mazo de 4 elementos, max 5 cartas y ordenada
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), cardsSetToString(CS3,CSTS3).
+
+%-----------------------------------------------------------------------------------
+%-----------------------------------TDA-Game----------------------------------------
+%-----------------------------------------------------------------------------------
+
+%---------------------------------Game-Constructor----------------------------------
+% dobbleGame con 4 jugadores, stackMode y un mazo de 3 elementos, max 4 cartas y desordenado
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],3,4,4512331,CS1), dobbleGame(4,CS1,"stackMode",5234,G1).
+
+% dobbleGame con 3 jugadores, stackMode y un mazo de 3 elementos, con el max de cartas y ordenado
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],3,MAX,0,CS2), dobbleGame(2,CS2,"stackMode",1324,G2).
+
+% dobbleGame con 2 jugadores, stackMode y un mazo de 4 elementos, max 5 cartas y ordenado
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3).
+
+%-----------------------dobbleGameRegister------------------------------------------
+% register "user1" -> lo agrega
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4).
+
+% register "user1" -> register "user1" -> false (porque ya se encuentra "user1" registrado)
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user1",G4,G5).
+
+% register "user1" -> register "user2" -> lo agrega
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5).
+
+%-----------------------dobbleGameWhoseTurnIsIt-------------------------------------
+% juego en progreso action->pass
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7),dobbleGameWhoseTurnIsIt(G7,Name).
+
+% juego en progreso action->spotIt->correcto
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7),dobbleGamePlay(G7,[spotIt,"user2",a],G8),dobbleGameWhoseTurnIsIt(G8,Name).
+
+% juego en progreso action->spotIt->incorrecto
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7),dobbleGamePlay(G7,[spotIt,"user2",a],G8),dobbleGamePlay(G8,[spotIt,"user1",b],G9),dobbleGameWhoseTurnIsIt(G9,Name).
+
+%--------------------------------dobbleGamePlay-------------------------------------
+% action -> null
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6).
+
+% action -> [pass] -> turno+1
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7).
+
+% action -> [spotIt,user,Element] -> correct -> turno+1 punto+1
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7),dobbleGamePlay(G7,[spotIt,"user2",a],G8).
+
+% action -> [spotIt,user,Element] -> incorrect -> turno+1
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7),dobbleGamePlay(G7,[spotIt,"user2",a],G8),dobbleGamePlay(G8,[spotIt,"user1",b],G9).
+
+% action -> [finish]
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7),dobbleGamePlay(G7,[spotIt,"user2",a],G8),dobbleGamePlay(G8,[spotIt,"user1",b],G9), dobbleGamePlay(G9,[finish], Gdiez).
+
+%------------------------------dobbleGameStatus-------------------------------------
+% Juego en progreso -> action -> pass
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7),dobbleGameStatus(G7,Status1).
+
+% Juego finalizado
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7),dobbleGamePlay(G7,[spotIt,"user2",a],G8),dobbleGamePlay(G8,[spotIt,"user1",b],G9), dobbleGamePlay(G9,[finish], Gdiez),dobbleGameStatus(Gdiez,Status2).
+
+% Juego en progreso -> action -> spotIt -> incorrecto
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7),dobbleGamePlay(G7,[spotIt,"user2",a],G8),dobbleGamePlay(G8,[spotIt,"user1",b],G9),dobbleGameStatus(G9,Status3).
+
+%------------------------------dobbleGameScore--------------------------------------
+% Juego en progreso
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7),dobbleGamePlay(G7,[spotIt,"user2",a],G8),dobbleGamePlay(G8,[spotIt,"user1",b],G9),dobbleGameScore(G9,"user1",Score1).
+
+% Juego finalizado
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7),dobbleGamePlay(G7,[spotIt,"user2",a],G8),dobbleGamePlay(G8,[spotIt,"user1",b],G9), dobbleGamePlay(G9,[finish], Gdiez),dobbleGameScore(Gdiez,"user2",Score2).
+
+% Juego en progreso
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7),dobbleGamePlay(G7,[spotIt,"user2",a],G8),dobbleGamePlay(G8,[spotIt,"user1",b],G9),dobbleGameScore(G9,"user2",Score3).
+
+%------------------------------dobbleGameToString-----------------------------------
+% Juego en progreso
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7),dobbleGamePlay(G7,[spotIt,"user2",a],G8),dobbleGamePlay(G8,[spotIt,"user1",b],G9),dobbleGameToString(G9,Gstr1).
+
+% Juego finalizado
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7),dobbleGamePlay(G7,[spotIt,"user2",a],G8),dobbleGamePlay(G8,[spotIt,"user1",b],G9), dobbleGamePlay(G9,[finish], Gdiez),dobbleGameToString(Gdiez,Gstr2).
+
+% Juego en progreso
+% cardsSet([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z],4,5,0,CS3), dobbleGame(2,CS3,"stackMode",6312,G3),dobbleGameRegister("user1",G3,G4),dobbleGameRegister("user2",G4,G5),dobbleGamePlay(G5,null,G6), dobbleGamePlay(G6,[pass],G7),dobbleGameToString(G7,Gstr3).
